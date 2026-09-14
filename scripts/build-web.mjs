@@ -1,0 +1,10 @@
+import {mkdir,copyFile,cp} from 'node:fs/promises';
+import {resolve} from 'node:path';
+const root=resolve(import.meta.dirname,'..'),out=resolve(root,'dist');
+await mkdir(out,{recursive:true});
+for(const file of ['index.html','style.css','mobile.css','rpg.css','hub.css','main-lobby.css','manifest.webmanifest','sw.js'])await copyFile(resolve(root,file),resolve(out,file));
+await cp(resolve(root,'js'),resolve(out,'js'),{recursive:true});
+await cp(resolve(root,'data'),resolve(out,'data'),{recursive:true});
+await mkdir(resolve(out,'assets'),{recursive:true});
+for(const file of ['sion.png','sion-lobby-portrait.png','hayeon-lobby-portrait.png','museum.png','stages.png','sion-animation.png','hayeon-animation.png','reception-hub.png','yeowol-title.png','yeowol-courtyard.png','exhibition-props-transparent.png','enemies.png','effects.png','elemental-effects.png','app-icon.svg','icon-192.png','icon-512.png'])await copyFile(resolve(root,'assets',file),resolve(out,'assets',file));
+console.log('Web app prepared: dist/ (runtime files and assets only)');

@@ -1,0 +1,16 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>IndexedDB 실제 브라우저 검증</title><style>body{background:#111b2d;color:#dbe9ed;font:16px system-ui;padding:40px}li{margin:14px 0}.fail{color:#ff9da6}</style><h1>IndexedDB 실제 저장 검증</h1><p>게임 슬롯과 분리된 임시 데이터베이스만 사용합니다.</p><ol id="results"></ol><strong id="status">실행 중</strong><script type="module">
+import {SaveManager,freshCampaign} from '../js/rpg/SaveManager.js';
+import {MapManager} from '../js/rpg/MapManager.js';
+const name='yeowol-test-'+Date.now(),manager=new SaveManager({name}),list=document.querySelector('#results');let passed=0,failed=0;
+const test=async(name,fn)=>{const li=document.createElement('li');try{await fn();li.textContent='PASS · '+name;passed++;}catch(e){failed++;li.className='fail';li.textContent='FAIL · '+name+' · '+e.message;}list.append(li);};
+const assert=(value,message)=>{if(!value)throw new Error(message);};
+await test('브라우저 fetch 바인딩과 실제 맵 JSON 로드',async()=>{const maps=new MapManager({fetcher:(url,options)=>fetch('../'+url.replace('./',''),options)});assert((await maps.load('0-entry')).points.length>0,'실제 맵 로드 실패');});
+await test('3개 슬롯 분리 및 JSON 대용량 왕복',async()=>{for(let i=1;i<=3;i++){const d=freshCampaign(i===2?'hayeon':'sion');d.inventory.fragment=i*10;d.world.killed=Array.from({length:120000},(_,n)=>`room-${i}:monster-${n}`);await manager.save(i,d,'test');}assert((await manager.list()).length===3,'슬롯 개수');assert((await manager.load(2)).inventory.fragment===20,'다른 슬롯 오염');assert((await manager.load(1)).world.killed.length===120000,'대용량 유실');});
+await test('연속 자동 저장 순서 보장과 마지막 값 복원',async()=>{const a=freshCampaign(),b=freshCampaign();a.inventory.fragment=1;b.inventory.fragment=2;await Promise.all([manager.save(1,a,'checkpoint'),manager.save(1,b,'checkpoint')]);assert((await manager.load(1)).inventory.fragment===2,'이전 저장이 최신 상태를 덮음');});
+await test('새 여정과 외부 백업은 기존 슬롯을 덮어쓰지 않음',async()=>{let rejected=false;try{await manager.save(1,freshCampaign(),'new');}catch{rejected=true;}assert(rejected,'기존 슬롯 덮어씀');assert((await manager.load(1)).inventory.fragment===2,'원본 유실');});
+await test('연결 종료 후 새 SaveManager에서 로드',async()=>{manager.close();const other=new SaveManager({name});assert((await other.load(2)).character==='hayeon','재접속 실패');other.close();});
+await test('트랜잭션 중단 시 이전 슬롯 보존',async()=>{let rejected=false;try{await manager.transaction('readwrite',store=>{const req=store.put({slot:1,json:'bad'});store.transaction.abort();return req;});}catch{rejected=true;}assert(rejected,'중단 오류 누락');assert((await manager.load(1)).inventory.fragment===2,'원자성 실패');});
+await test('SHA-256 손상 검출과 손상 슬롯 원본 보존',async()=>{const record=(await manager.list()).find(r=>r.slot===3);record.json=record.json.replace('"sion"','"hayeon"');await manager.transaction('readwrite',store=>store.put(record));let rejected=false;try{await manager.load(3);}catch{rejected=true;}assert(rejected,'손상 미검출');assert((await manager.list()).some(r=>r.slot===3),'원본 삭제됨');});
+manager.close();indexedDB.deleteDatabase(name);document.querySelector('#status').textContent=`완료: ${passed} 통과 / ${failed} 실패`;
+</script></html>
+

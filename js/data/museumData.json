@@ -1,0 +1,21 @@
+{
+  "museum": {
+    "name": "부천시립박물관",
+    "siteContext": "경기도 부천시 여월동 점말 가마터와 고강동 선사유적의 역사적 맥락을 바탕으로 한 게임 데이터",
+    "phaseHint": "낮에는 전시와 복원, 밤에는 닫힌 전시관의 시간 균열을 탐험한다."
+  },
+  "stages": [
+    {"id":"onggi-hall","name":"옹기관","site":"여월동 점말 가마터","boss":"점말 가마귀","relic":"onggi_guard"},
+    {"id":"history-hall","name":"향토역사관","site":"고강동 선사유적","boss":"흑요의 제사장","relic":"prehistoric_wedge"},
+    {"id":"stone-hall","name":"수석관","site":"부천의 수석 전시","boss":"천년의 수석령","relic":"gravity_silence"},
+    {"id":"european-ceramics","name":"유럽자기관","site":"유럽 도자기 전시","boss":"도자기 여왕","relic":"glaze_echo"},
+    {"id":"education-hall","name":"교육관","site":"근현대 생활문화 전시","boss":"엄격한 규율의 교장","relic":"graduation_token"},
+    {"id":"final-repository","name":"지하 통합 수장고","site":"모든 시대가 모이는 심연","boss":"망각의 수장고 관리자","relic":"time_restoration"}
+  ],
+  "relics": [
+    {"id":"pointmal_onggi","name":"점말 옹기","material":"옹기토","description":"여월동 점말 가마터의 옹기 제작 전통을 모티브로 한 질그릇 유물.","requiredFragments":12,"archive":"옹기는 숨 쉬는 그릇으로 불리며 저장과 발효에 쓰였다."},
+    {"id":"gogang_stone_sword","name":"고강동 간돌검","material":"간돌","description":"고강동 선사유적의 제사와 생활을 상징하는 간돌검.","requiredFragments":10,"archive":"간돌검은 돌을 갈아 날을 세운 선사시대 도구와 무기의 한 형태다."},
+    {"id":"hwayu_mirror","name":"화유옹주 거울","material":"청동","description":"조선 후기 화유옹주 묘 부장품에서 모티브를 얻은 거울.","requiredFragments":8,"archive":"화유옹주는 영조의 딸로, 게임에서는 기억과 빛을 잇는 유물로 재해석된다."},
+    {"id":"european_shard","name":"유럽 자기 파편","material":"자기","description":"유럽 자기 전시의 깨진 식기와 인형 파편.","requiredFragments":15,"archive":"도자기는 흙과 유약, 불의 조합으로 서로 다른 문화의 미감을 담는다."}
+  ]
+}

@@ -1,0 +1,14 @@
+E:\VScode\SmartMediaTestFolder\dotnet\bin\Debug\net8.0\MuseumTwilight.exe
+E:\VScode\SmartMediaTestFolder\dotnet\bin\Debug\net8.0\MuseumTwilight.deps.json
+E:\VScode\SmartMediaTestFolder\dotnet\bin\Debug\net8.0\MuseumTwilight.runtimeconfig.json
+E:\VScode\SmartMediaTestFolder\dotnet\bin\Debug\net8.0\MuseumTwilight.dll
+E:\VScode\SmartMediaTestFolder\dotnet\bin\Debug\net8.0\MuseumTwilight.pdb
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\MuseumTwilight.GeneratedMSBuildEditorConfig.editorconfig
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\MuseumTwilight.AssemblyInfoInputs.cache
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\MuseumTwilight.AssemblyInfo.cs
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\MuseumTwilight.csproj.CoreCompileInputs.cache
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\MuseumTwilight.dll
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\refint\MuseumTwilight.dll
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\MuseumTwilight.pdb
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\MuseumTwilight.genruntimeconfig.cache
+E:\VScode\SmartMediaTestFolder\dotnet\obj\Debug\net8.0\ref\MuseumTwilight.dll
