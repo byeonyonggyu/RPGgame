@@ -1,0 +1,2 @@
+// Progression applies on room entry; saved enemies retain their remaining HP ratio.
+export function difficulty(stage=0,cleared=0,cycle=1){const progress=Math.max(0,Math.min(6,cleared)),tier=Math.max(0,Math.min(5,stage)),loop=Math.max(0,cycle-1);return{hp:(1+tier*.24+progress*.07)*(1+loop*.25),damage:1+tier*.13+progress*.045+loop*.12,speed:1+tier*.055+progress*.02,cooldown:Math.max(.58,1-tier*.055-progress*.025-loop*.03),volley:tier>=3||progress>=3?3:1,bossHp:Math.round((510+tier*165)*(1+progress*.045)*(1+loop*.3))};}

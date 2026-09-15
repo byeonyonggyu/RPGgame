@@ -6,11 +6,11 @@ export const CHARACTERS=[
 ];
 const event=(id,type,target,count=1,phase)=>({id,event:type,target,count,...(phase?{phase}:{})});
 export const QUESTS=[
- {id:'welcome',name:'점말 옹기의 첫 전시 목록',description:'안내 데스크에서 점동이에게 옹기 전시 정리 의뢰를 받고, 유물을 대하는 마음을 선택하세요.',condition:{all:[event('talk','talk','jeomdong',1,'day'),{any:[{flag:'approach',value:'comfort'},{flag:'approach',value:'study'}]}]},reward:{stage:0,amount:3}},
+ {id:'welcome',name:'점말 옹기의 첫 전시 목록',description:'안내 데스크에서 도윤 학예사 또는 점동이에게 옹기 전시 정리 의뢰를 받고, 유물을 대하는 마음을 선택하세요.',condition:{all:[event('talk','talk',['jeomdong','curator'],1,'day'),{any:[{flag:'approach',value:'comfort'},{flag:'approach',value:'study'}]}]},reward:{stage:0,amount:3}},
  ...STAGES.flatMap((st,i)=>[
  {id:`trail-${i}`,name:ARTIFACTS[i].trail,description:`${ARTIFACTS[i].short} 전시대 3곳을 관찰해 기록하고 전시 조명 제어대를 작동하세요.`,requires:i?[`boss-${i-1}`]:['welcome'],condition:{all:[event('observations','inspect',String(i),3),event('switch','switch',`${i}-gallery:switch`)]},reward:{stage:i,amount:3}},
  {id:`boss-${i}`,name:ARTIFACTS[i].boss,description:`${ARTIFACTS[i].short}의 전시 순서를 복원하고 ${st.boss}의 원념을 정화하세요.`,requires:[`trail-${i}`],condition:{all:[event('placed','place',String(i),i===5?5:3),event('boss','boss',String(i))]},reward:{stage:i,amount:5}},
- {id:`archive-${i}`,name:ARTIFACTS[i].archive,description:`유물 능력으로 기록실을 열어 ${ARTIFACTS[i].short}의 전시 기록을 회수한 뒤 안내 데스크에 보고하세요.`,requires:[`boss-${i}`],condition:{all:[event('memory','collect',`archive-${i}`),{...event('report','talk','jeomdong',1,'day'),after:'memory'}]},reward:{stage:i,amount:6}}
+ {id:`archive-${i}`,name:ARTIFACTS[i].archive,description:`유물 능력으로 기록실을 열어 ${ARTIFACTS[i].short}의 전시 기록을 회수한 뒤 안내 데스크에 보고하세요.`,requires:[`boss-${i}`],condition:{all:[event('memory','collect',`archive-${i}`),{...event('report','talk',['jeomdong','curator'],1,'day'),after:'memory'}]},reward:{stage:i,amount:6}}
  ]),
  {id:'museum',name:'모든 시대의 방명록',description:'여섯 기록실의 원본을 모으고 마지막 관리자를 위로하세요.',condition:{all:[...STAGES.map((_,i)=>event(`a${i}`,'collect',`archive-${i}`)),event('final','boss','5')]},reward:{stage:5,amount:12}}
 ];

@@ -44,21 +44,27 @@
   "enemies": [
     {
       "id": "0-sanctum:mob:0",
-      "x": 280,
-      "y": 480,
+      "x": 260,
+      "y": 470,
       "variant": 0
     },
     {
       "id": "0-sanctum:mob:1",
-      "x": 405,
-      "y": 540,
+      "x": 430,
+      "y": 470,
       "variant": 1
     },
     {
       "id": "0-sanctum:mob:2",
-      "x": 530,
-      "y": 480,
+      "x": 600,
+      "y": 470,
       "variant": 0
+    },
+    {
+      "id": "0-sanctum:mob:3",
+      "x": 940,
+      "y": 470,
+      "variant": 1
     }
   ]
 }

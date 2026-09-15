@@ -51,15 +51,21 @@
   "enemies": [
     {
       "id": "2-archive:mob:0",
-      "x": 280,
-      "y": 480,
+      "x": 260,
+      "y": 470,
       "variant": 0
     },
     {
       "id": "2-archive:mob:1",
-      "x": 405,
-      "y": 540,
+      "x": 430,
+      "y": 470,
       "variant": 1
+    },
+    {
+      "id": "2-archive:mob:2",
+      "x": 600,
+      "y": 470,
+      "variant": 0
     }
   ]
 }

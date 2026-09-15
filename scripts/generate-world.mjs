@@ -18,7 +18,7 @@ for(let stage=0;stage<6;stage++)for(const kind of ['entry','gallery','archive','
   if(stage===1)points.push({type:'npc',id:'hwayu',name:'화유옹주의 잔향',x:920,y:570});
  }else if(kind==='archive')points.push(portal('탐험실로',`${stage}-gallery`,160,420),{type:'chest',id:`archive-${stage}`,name:'잊힌 기억 원본',x:1000,y:280});
  else points.push(portal('탐험실로',`${stage}-gallery`,160,590));
- const room={id,stage,kind,name:`${STAGES[stage].name} · ${{entry:'수장고 텐트',gallery:'기억의 회랑',archive:'숨은 기록실',sanctum:'원념의 전시실'}[kind]}`,tileSize:40,tiles:tiles.map(r=>r.join('')),spawns:{default:{x:640,y:580}},points,enemies:kind==='entry'?[]:Array.from({length:kind==='gallery'?3+stage:kind==='archive'?2:3},(_,i)=>({id:`${id}:mob:${i}`,x:280+i*125,y:480+(i%2)*60,variant:i%2}))};
+ const room={id,stage,kind,name:`${STAGES[stage].name} · ${{entry:'수장고 텐트',gallery:'기억의 회랑',archive:'숨은 기록실',sanctum:'원념의 전시실'}[kind]}`,tileSize:40,tiles:tiles.map(r=>r.join('')),spawns:{default:{x:640,y:580}},points,enemies:kind==='entry'?[]:Array.from({length:kind==='gallery'?5+stage:kind==='archive'?3:4},(_,i)=>({id:`${id}:mob:${i}`,x:[260,430,600,940,1110][i%5],y:470+Math.floor(i/5)*80,variant:i%2}))};
  await writeFile(new URL(`${id}.json`,out),JSON.stringify(room,null,2)+'\n');
 }
 console.log('Authored 24 connected tile rooms.');

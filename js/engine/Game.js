@@ -1,3 +1,4 @@
+import {difficulty} from '../data/difficulty.js';
 import { RPGController } from '../rpg/RPGController.js';
 import { TouchInput, canvasPoint, movementVector } from '../platform/TouchInput.js';
 import { MobileDisplay } from '../platform/MobileDisplay.js';
@@ -72,7 +73,8 @@ export class Game {
   document.querySelectorAll('[data-skill]').forEach(b=>b.onclick=()=>this.cast(Number(b.dataset.skill)));$('potion').onclick=()=>this.heal();
   this.weaponHud();this.canvas.focus({preventScroll:true});window.scrollTo(0,0);this.toast(`${st.name} · ${st.objective}`);this.updateHud();
  }
- makeEnemy(x,y,variant=0){const design=ENEMIES[this.stageIndex][variant],hp=(45+this.stageIndex*7)*(design.role==='tank'?1.65:design.role==='ranged'?.8:1);return {x,y,hp,maxHp:hp,speed:design.role==='tank'?34:54+this.stageIndex*4,freeze:0,variant,role:design.role,name:design.name,seed:this.enemySerial++,hitFlash:0,windup:0,charge:0,attackTimer:1.5+Math.random(),facing:1};}
+ get combatDifficulty(){return difficulty(this.stageIndex,this.save.cleared.length,this.rpg?.data?.cycle||1);}
+ makeEnemy(x,y,variant=0){const design=ENEMIES[this.stageIndex][variant],level=this.combatDifficulty,hp=78*level.hp*(design.role==='tank'?1.65:design.role==='ranged'?.9:1);return {x,y,hp,maxHp:hp,speed:(design.role==='tank'?48:82)*level.speed,freeze:0,variant,role:design.role,name:design.name,seed:this.enemySerial++,hitFlash:0,windup:0,charge:0,attackTimer:(.9+Math.random()*.6)*level.cooldown,facing:1};}
 
  listen(target,event,handler){target.addEventListener(event,handler);this.cleanups.push(()=>target.removeEventListener?.(event,handler));}
  dispose(){this.disposed=true;cancelAnimationFrame(this.frame);clearTimeout(this.toastTimer);this.rpg?.dispose();this.input.dispose?.();this.display.dispose?.();for(const off of this.cleanups.splice(0))off();this.audio?.close();}
@@ -148,7 +150,7 @@ export class Game {
   if(s===4&&Math.sin(this.time*2)<0){this.toast('지금은 빨간 종 · 초록 종을 기다리세요.');return;}
   if(s===5&&!this.save.cleared.includes(i))return;
   n.done=true;this.rpg?.event('place',String(s));this.loot+=1;this.effects.push({x:n.x,y:n.y,r:110,life:.8,max:.8,color:'#b5efde'});this.tone(500+i*110);this.toast(`${n.name} · 기억을 되찾았습니다`);
-  if(this.nodes.every(n=>n.done)){this.boss={x:980,y:270,hp:(230+s*65)*(1+((this.rpg?.data?.cycle||1)-1)*.25),maxHp:(230+s*65)*(1+((this.rpg?.data?.cycle||1)-1)*.25),freeze:0};this.bossTimer=2;this.toast(`${STAGES[s].boss} · ${STAGES[s].pattern}`);}this.updateHud();
+  if(this.nodes.every(n=>n.done)){this.boss={x:980,y:270,hp:this.combatDifficulty.bossHp,maxHp:this.combatDifficulty.bossHp,freeze:0};this.bossTimer=2;this.toast(`${STAGES[s].boss} · ${STAGES[s].pattern}`);}this.updateHud();
  }
  nearNode(){return this.nodes.filter(n=>!n.done&&distance(n,this.player)<100).sort((a,b)=>distance(a,this.player)-distance(b,this.player))[0];}
  damage(amount){const p=this.player;if(this.state!=='battle'||p.inv>0)return;if(p.shield>0){this.fx.emit('shield',p.x,p.y-20,{size:70,color:'#f0ce8b',amount:4,life:.2});return;}p.hp=Math.max(0,p.hp-amount);p.inv=.75;p.hurtAnim=.38;this.combo=0;this.fx.emit('hit',p.x,p.y-35,{color:'#ff8a9c',size:100,amount:16});this.fx.number(p.x,p.y-90,`−${amount}`,'#ff9daa');this.fx.shake=5;this.tone(120,.12,.07);if(p.hp===0)this.defeat();}
@@ -167,12 +169,12 @@ export class Game {
    else if(e.windup>0){e.windup-=enemyDt;if(e.windup<=0){e.charge=.45;e.chargeX=ux;e.chargeY=uy;this.fx.element(this.stageIndex,e.x,e.y-20,'charge',e.variant);}}
    else if(e.role==='ranged'){
     const direction=d<180?-1:d>320?1:0;e.x=clamp(e.x+ux*e.speed*direction*enemyDt,65,1215);e.y=clamp(e.y+uy*e.speed*direction*enemyDt,190,650);
-    if(e.attackTimer<=0){this.bullets.push({x:e.x,y:e.y-15,vx:ux*190,vy:uy*190,life:5,ally:false,stage:this.stageIndex,source:'ranged'});e.attackTimer=2.8;this.fx.element(this.stageIndex,e.x,e.y-25,'ranged',e.variant);}
-   }else{e.x+=ux*e.speed*enemyDt;e.y+=uy*e.speed*enemyDt;if(e.role==='charger'&&d<250&&e.attackTimer<=0){e.windup=.65;e.attackTimer=3.8;}}
-   this.rpg?.constrainActor(e,oldPosition);if(distance(e,p)<35)this.damage(e.role==='tank'?13:9);
+    if(e.attackTimer<=0){const level=this.combatDifficulty,aim=Math.atan2(p.y-e.y,p.x-e.x);for(let shot=0;shot<level.volley;shot++){const angle=aim+(shot-(level.volley-1)/2)*.16,speed=220*level.speed;this.bullets.push({x:e.x,y:e.y-15,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:5,ally:false,stage:this.stageIndex,source:'ranged'});}e.attackTimer=2.2*level.cooldown;this.fx.element(this.stageIndex,e.x,e.y-25,'ranged',e.variant);}
+   }else{e.x+=ux*e.speed*enemyDt;e.y+=uy*e.speed*enemyDt;if(e.role==='charger'&&d<250&&e.attackTimer<=0){e.windup=Math.max(.45,.65*this.combatDifficulty.cooldown);e.attackTimer=2.8*this.combatDifficulty.cooldown;}}
+   this.rpg?.constrainActor(e,oldPosition);if(distance(e,p)<35)this.damage(Math.round((e.role==='tank'?18:13)*this.combatDifficulty.damage));
   }
   if(this.state!=='battle')return;
-  if(this.boss&&this.boss.hp>0){this.boss.hitFlash=Math.max(0,(this.boss.hitFlash||0)-dt);this.bossTimer-=enemyDt;if(this.bossTimer<=0){this.bossAttack();this.bossTimer=this.boss.hp<this.boss.maxHp*.4?1.6:2.6;}}
+  if(this.boss&&this.boss.hp>0){this.boss.hitFlash=Math.max(0,(this.boss.hitFlash||0)-dt);this.bossTimer-=enemyDt;if(this.bossTimer<=0){this.bossAttack();this.bossTimer=(this.boss.hp<this.boss.maxHp*.4?1.35:2.1)*this.combatDifficulty.cooldown;}}
   if(this.stageIndex===0&&!this.nodes.every(n=>n.done)&&Math.floor(this.time)!==this.gasTick){this.gasTick=Math.floor(this.time);if(p.x<150||p.x>1130)this.damage(4);}
   if(this.state!=='battle')return;
   for(const b of this.bullets){
@@ -180,23 +182,23 @@ export class Game {
    if(b.kind==='moon'&&b.age>.48){if(!b.returning){b.returning=true;b.hit.clear();}const a=Math.atan2(p.y-20-b.y,p.x-b.x);b.vx=Math.cos(a)*650;b.vy=Math.sin(a)*650;if(Math.hypot(b.x-p.x,b.y-(p.y-20))<24)b.life=0;}
    b.x+=b.vx*step;b.y+=b.vy*step;b.life-=dt;if(this.rpg?.projectileBlocked(oldX,oldY,b.x,b.y))b.life=0;if(b.life<=0)continue;
    if(b.ally){for(const e of [...this.enemies,...(this.boss?[this.boss]:[])])if(e.hp>0&&!b.hit.has(e)&&segmentDistance(e.x,e.y,oldX,oldY,b.x,b.y)<(e===this.boss?53:30)){this.hitEnemy(e,b.damage);b.hit.add(e);if(!b.pierce){b.life=0;break;}}}
-   else if(segmentDistance(p.x,p.y,oldX,oldY,b.x,b.y)<28){if(p.shield>0){b.ally=true;b.vx=-b.vx;b.vy=-b.vy;b.damage=p.attack*2;b.life=2;b.color='#f9d79d';this.fx.emit('shield',b.x,b.y,{color:'#f9d79d',size:60,amount:8});}else{this.damage(10+this.stageIndex);b.life=0;}}
+   else if(segmentDistance(p.x,p.y,oldX,oldY,b.x,b.y)<28){if(p.shield>0){b.ally=true;b.vx=-b.vx;b.vy=-b.vy;b.damage=p.attack*2;b.life=2;b.color='#f9d79d';this.fx.emit('shield',b.x,b.y,{color:'#f9d79d',size:60,amount:8});}else{this.damage(Math.round(14*this.combatDifficulty.damage));b.life=0;}}
   }
   this.bullets=this.bullets.filter(b=>b.life>0&&b.x>-60&&b.x<1340&&b.y>-60&&b.y<780);
   if(this.state!=='battle')return;
-  this.hazards.forEach(h=>{h.delay-=enemyDt;if(h.delay<=0&&!h.hit){h.hit=true;const hit=h.shape==='cross'?Math.abs(p.x-h.x)<35||Math.abs(p.y-h.y)<35:h.shape==='ring'?Math.abs(distance(p,h)-h.r)<30:distance(p,h)<h.r;if(hit){this.damage(16+this.stageIndex*2);if(this.stageIndex===4&&p.buff<=0)p.slow=2;}this.fx.element(this.stageIndex,h.x,h.y,'boss');}});this.hazards=this.hazards.filter(h=>h.delay>-.3);
+  this.hazards.forEach(h=>{h.delay-=enemyDt;if(h.delay<=0&&!h.hit){h.hit=true;const hit=h.shape==='cross'?Math.abs(p.x-h.x)<35||Math.abs(p.y-h.y)<35:h.shape==='ring'?Math.abs(distance(p,h)-h.r)<30:distance(p,h)<h.r;if(hit){this.damage(Math.round(21*this.combatDifficulty.damage));if(this.stageIndex===4&&p.buff<=0)p.slow=2;}this.fx.element(this.stageIndex,h.x,h.y,'boss');}});this.hazards=this.hazards.filter(h=>h.delay>-.3);
   this.enemies=this.enemies.filter(e=>{if(e.hp>0)return true;this.rpg?.killed(e);this.drops.push({x:e.x,y:e.y});this.combo++;this.fx.element(this.stageIndex,e.x,e.y-20,'death',e.variant);return false;});
   this.drops=this.drops.filter(d=>{if(distance(d,p)<70){this.loot++;this.rpg?.collected();this.tone(850,.035,.025);return false;}return true;});
   this.effects=this.effects.filter(e=>{e.life-=dt;return e.life>0;});
   if(this.state==='battle'&&this.boss&&this.boss.hp<=0){this.victoryDelay=.8;this.input.reset();this.keys.clear();this.firing=false;this.bullets=[];this.fx.element(this.stageIndex,this.boss.x,this.boss.y-30,'boss');this.fx.emit('nova',this.boss.x,this.boss.y-20,{size:190,color:STAGES[this.stageIndex].color,life:.8,amount:30});return;}if(this.state==='battle')this.updateHud();
  }
 
- bossAttack(){const b=this.boss,p=this.player,s=this.stageIndex;const shot=(angle,speed=180)=>this.bullets.push({x:b.x,y:b.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:6,ally:false,stage:s,source:'boss'});
+ bossAttack(){const b=this.boss,p=this.player,s=this.stageIndex;const shot=(angle,speed=180)=>this.bullets.push({x:b.x,y:b.y,vx:Math.cos(angle)*speed*this.combatDifficulty.speed,vy:Math.sin(angle)*speed*this.combatDifficulty.speed,life:6,ally:false,stage:s,source:'boss'});
   if(s===0||s===2||s===4||s===5){const count=s===2?3:s===5?4:2;for(let i=0;i<count;i++)this.hazards.push({x:clamp(p.x+(i?Math.sin(this.time+i)*180:0),100,1180),y:clamp(p.y+(i?Math.cos(this.time+i)*150:0),190,640),r:s===0?105:80,delay:1.1,hit:false,shape:'circle'});}
   if(s===1)this.hazards.push({x:p.x,y:p.y,r:200,delay:1.2,hit:false,shape:'cross'});
   if(s===2)this.hazards.push({x:b.x,y:b.y,r:250,delay:1.3,hit:false,shape:'ring'});
   this.fx.element(s,b.x,b.y-30,'boss');b.hitFlash=.12;
-  const n=s===3?16:s===5?18:8;
+  const n=(s===3?16:s===5?18:10)+Math.min(4,this.save.cleared.length);
   if(s===4){const angle=Math.atan2(p.y-b.y,p.x-b.x);for(let j=-3;j<=3;j++)shot(angle+j*.18,230);}else for(let j=0;j<n;j++)shot(j/n*Math.PI*2+this.time*.3,s===3?170:145);
   if(s===3&&this.enemies.length<5)this.enemies.push({...this.makeEnemy(b.x-90,b.y+50),id:this.rpg?.area.current?`${this.rpg.area.current.id}:summon:${this.enemySerial}`:undefined});
  }
