@@ -81,6 +81,7 @@ export class RPGController {
  move(player,dx,dy){if(!this.active||!this.area.current)return false;this.map.move(this.area.current,player,dx*this.character.speed,dy*this.character.speed);return true;}
  constrainActor(actor,old){if(!this.active||!this.area.current)return;const dx=actor.x-old.x,dy=actor.y-old.y;actor.x=old.x;actor.y=old.y;this.map.move(this.area.current,actor,dx,dy);}
  enemyTarget(actor,player,dt){if(!this.active||!this.area.current||!this.map.rayBlocked(this.area.current,actor.x,actor.y,player.x,player.y))return player;actor.navTime=(actor.navTime||0)-dt;if(actor.navTime<=0||!actor.waypoint||Math.hypot(actor.x-actor.waypoint.x,actor.y-actor.waypoint.y)<12){actor.navTime=.35;actor.waypoint=this.map.nextStep(this.area.current,actor,player);}return actor.waypoint;}
+ // Projectiles are drawn 20px above the floor plane; only tile walls collide.
  projectileBlocked(x1,y1,x2,y2){return this.active&&this.area.current&&this.map.rayBlocked(this.area.current,x1,y1+20,x2,y2+20);}
  tick(dt){if(!this.active||!this.area.current)return;this.data.playSeconds+=dt;const point=this.area.current.points.find(p=>p.type==='checkpoint'&&Math.hypot(p.x-this.game.player.x,p.y-this.game.player.y)<70);if(point&&!this.campVisited){this.campVisited=true;this.rest();}}
  rest(){this.game.player.hp=this.game.player.maxHp;this.game.potions=this.game.save.clues.includes(this.game.stageIndex)?3:2;this.game.fx.emit('heal',this.game.player.x,this.game.player.y,{color:'#a5ead5',size:130,amount:16});this.run(()=>this.save('checkpoint'));this.game.toast('안전한 텐트 · 생명 회복 · 자동 저장');}
@@ -98,7 +99,7 @@ export class RPGController {
  collected(){this.event('collect','fragment');}
  recordObservation(point){if(!this.active||!this.inspectionReady()||this.data.world.collected.includes(point.id))return false;this.data.world.collected.push(point.id);this.event('inspect',String(this.game.stageIndex));this.game.fx.element(this.game.stageIndex,point.x,point.y,'impact');return true;}
  inspectionReady(){return !this.game.enemies.some(e=>e.hp>0)&&!(this.game.boss?.hp>0);}
- restorationProgress(point){if(this.data.world.collected.includes(point.id))return 1;const room=this.area.current,total=room?.enemies.length||1,remaining=this.game.enemies.filter(e=>e.hp>0).length;return Math.min(.88,Math.max(0,1-remaining/total)*.88);}
+ restorationProgress(point){if(this.data.world.collected.includes(point.id))return 1;const room=this.area.current,remaining=this.game.enemies.filter(e=>e.hp>0).length,total=Math.max(1,remaining+this.data.world.killed.filter(id=>id.startsWith(room?.id+':mob:')).length);return Math.min(.88,Math.max(0,1-remaining/total)*.88);}
  inspectArtifact(point){if(!this.inspectionReady()){this.game.toast(`주변의 적 ${this.game.enemies.filter(e=>e.hp>0).length}마리를 먼저 정화하세요. 유물이 아직 불안정합니다.`);return false;}this.conversation.inspect(point);return true;}
 
  onVictory(){if(!this.active)return;const i=this.game.stageIndex;this.event('boss',String(i));const id=`${i}-sanctum:boss`;if(!this.data.world.killed.includes(id))this.data.world.killed.push(id);this.capture();this.data.inventory[`field-${i}`]=0;this.area.dispose();this.data.player=null;this.data.location={room:'desk',spawn:'default'};this.data.phase='day';}

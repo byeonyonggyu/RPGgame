@@ -10,7 +10,10 @@ export class ExhibitionRenderer {
   let a=this.assembly.get(key);if(!a){a={value:target,time,burst:-99};this.assembly.set(key,a);}const dt=Math.max(0,Math.min(.1,time-a.time));a.time=time;
   if(target>a.value+.005)a.burst=time;a.value+= (target-a.value)*(1-Math.exp(-dt*5));if(Math.abs(target-a.value)<.001)a.value=target;
   const sw=this.openAtlas.naturalWidth/4,sh=this.openAtlas.naturalHeight/3,sx=index%4*sw,sy=Math.floor(index/4)*sh,gap=(1-a.value)*19;
-  for(let row=0;row<3;row++)for(let col=0;col<2;col++){const dx=(col-.5)*gap,dy=(row-1)*gap*.55;c.save();c.globalAlpha*=.65+.35*a.value;c.drawImage(this.openAtlas,sx+col*sw/2,sy+row*sh/3,sw/2,sh/3,x+col*w/2+dx,y+row*h/3+dy+Math.sin(time*2+row+col)*gap*.08,w/2,h/3);c.restore();}
+  // Keep the low plinth intact; only the artifact separates into irregular shards.
+  c.drawImage(this.openAtlas,sx,sy+sh*.76,sw,sh*.24,x,y+h*.76,w,h*.24);
+  const vertex=(row,col)=>[col===1?(.5+[0,.09,-.07,0][row])*w:col*w/2,row===0?0:row===3?h*.76:(row*.76/3+(col===1?.045:0))*h];
+  for(let row=0;row<3;row++)for(let col=0;col<2;col++){const dx=(col-.5)*gap,dy=(row-1)*gap*.55;c.save();c.translate(x+dx,y+dy+Math.sin(time*2+row+col)*gap*.08);c.globalAlpha*=.65+.35*a.value;c.beginPath();[vertex(row,col),vertex(row,col+1),vertex(row+1,col+1),vertex(row+1,col)].forEach(([px,py],i)=>i?c.lineTo(px,py):c.moveTo(px,py));c.closePath();c.clip();c.drawImage(this.openAtlas,sx,sy,sw,sh,0,0,w,h);c.restore();}
   if(time-a.burst<.9){c.save();c.strokeStyle=target===1?'#ffe3a0':'#a9dcfa';c.globalAlpha*=1-(time-a.burst)/.9;c.lineWidth=2;c.beginPath();c.ellipse(x+w/2,y+h-8,w*(.3+(time-a.burst)*.2),10+(time-a.burst)*14,0,0,Math.PI*2);c.stroke();c.restore();}return true;
  }
  wall(c,stage,x,y){if(this.sprite(c,stage,x-7,y-31,54,77))return;c.save();const gradient=c.createLinearGradient(x,y-13,x,y+40);gradient.addColorStop(0,STAGES[stage].color);gradient.addColorStop(1,'#202438');c.fillStyle=gradient;c.fillRect(x,y-8,40,48);this.sprite(c,stage,x-7,y-31,54,77);c.restore();}
