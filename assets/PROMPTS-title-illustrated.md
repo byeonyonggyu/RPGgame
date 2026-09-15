@@ -1,0 +1,5 @@
+# Illustrated title screen
+
+Output: assets/yeowol-title-illustrated.png. Built-in imagegen edit using the previous title composition and the two adult-proportion lobby portraits as identity references.
+
+Create premium cinematic 16:9 landscape title-screen key visual. Replace all chibi/doll characters with mature elegant adult anime characters matching the lobby portraits in identity and costume. Seven-head-tall anatomy, sophisticated detailed 2D anime painting, crisp face linework, dramatic cinematic lighting. Sion foreground center-right with teal hair, pointed navy gold mage hat, purple embroidered coat, mirror casting violet moonlight; Hayeon behind upper-right with silver blue hair, blue beret, blue ivory coat dress, porcelain flower magic. Long flowing clothes and archival pages sweep diagonally through an ornate moonlit Korean museum of pottery, scholar rocks and brass-framed cases. Rich sapphire, purple and gold, reflective floor and deep atmospheric perspective. Left third dark and uncluttered for HTML title. Keep faces near central width for responsive crop. No text, logos or borders; full-bleed original game illustration.
