@@ -6,5 +6,5 @@ for(const file of ['index.html','style.css','mobile.css','rpg.css','hub.css','ma
 await cp(resolve(root,'js'),resolve(out,'js'),{recursive:true});
 await cp(resolve(root,'data'),resolve(out,'data'),{recursive:true});
 await mkdir(resolve(out,'assets'),{recursive:true});
-for(const file of ['sion.png','curator-doyun-portrait.png','curator-doyun-sprite.png','sion-lobby-portrait.png','hayeon-lobby-portrait.png','museum.png','stages.png','sion-animation.png','hayeon-animation.png','reception-hub.png','yeowol-title.png','yeowol-title-illustrated.png','yeowol-courtyard.png','exhibition-props-transparent.png','enemies.png','effects.png','elemental-effects.png','app-icon.svg','icon-192.png','icon-512.png'])await copyFile(resolve(root,'assets',file),resolve(out,'assets',file));
+for(const file of ['sion.png','curator-doyun-portrait.png','curator-doyun-sprite.png','exhibition-open.png','sion-lobby-portrait.png','hayeon-lobby-portrait.png','museum.png','stages.png','sion-animation.png','hayeon-animation.png','reception-hub.png','yeowol-title.png','yeowol-title-illustrated.png','yeowol-courtyard.png','exhibition-props-transparent.png','enemies.png','effects.png','elemental-effects.png','app-icon.svg','icon-192.png','icon-512.png'])await copyFile(resolve(root,'assets',file),resolve(out,'assets',file));
 console.log('Web app prepared: dist/ (runtime files and assets only)');

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MuseumTwilight")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+06d07945a8d31f693f9bc4d4bb62853eaa0c0c33")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6461792c82dcac3ab8e9e0ce36f70f81bd34db0e")]
 [assembly: System.Reflection.AssemblyProductAttribute("MuseumTwilight")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MuseumTwilight")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
